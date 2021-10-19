@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "views_runs"
+version = "0.1.0"
+description = ""
+authors = ["peder2911 <pglandsverk@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8,<3.10"
+views-partitioning = "~=2.1.0"
+stepshift = "~=1.2.0"
+sklearn = "^0.0"
+
+[tool.poetry.dev-dependencies]
+jedi = "^0.18.0"
+pylint = "^2.11.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
