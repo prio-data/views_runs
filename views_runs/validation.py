@@ -12,7 +12,7 @@ def dataframe_is_right_format(dataframe: pd.DataFrame):
         raise ValidationError("Dataframe must have a two-level index")
 
     try:
-        assert set(dataframe.dtypes) == {np.float64}
+        assert set(dataframe.dtypes) == {np.dtype(float)}
     except AssertionError:
         raise ValidationError("The dataframe must contain only np.float64 floats")
 

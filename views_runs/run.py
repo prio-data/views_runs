@@ -24,7 +24,10 @@ class ViewsRun():
 
     @validation.views_validate
     def predict(self, partition_name: str, timespan_name: str, data: pd.DataFrame)-> pd.DataFrame:
-        predictions = self._models.predict(self._prediction_partitioner(partition_name, timespan_name, data))
+        predictions = self._models.predict(
+                self._prediction_partitioner(partition_name, timespan_name, data),
+                combine = False)
+        predictions.index.names = data.index.names
         data = data.merge(predictions, how = "left", left_index = True, right_index = True)
         return self._partitioner(partition_name,timespan_name,data)
 
