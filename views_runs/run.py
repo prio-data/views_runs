@@ -45,5 +45,6 @@ class ViewsRun():
         data = data.merge(predictions, how = "left", left_index = True, right_index = True)
         return self._partitioner(partition_name,timespan_name,data)
 
+    @property
     def models(self):
-        return self._models
+        return self._models.models
