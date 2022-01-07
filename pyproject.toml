@@ -1,14 +1,16 @@
 [tool.poetry]
 name = "views_runs"
-version = "1.0.0"
+version = "1.1.0"
 description = ""
 authors = ["peder2911 <pglandsverk@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8,<3.10"
-views-partitioning = "~=2.3.0"
 stepshift = "~=2.0.0"
 sklearn = "^0.0"
+views-partitioning = "^3.0.0"
+viewser = "^5.4.0"
+views-storage = "^0.3.0"
 
 [tool.poetry.dev-dependencies]
 jedi = "^0.18.0"
