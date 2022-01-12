@@ -8,7 +8,7 @@ class TestStats(TestCase):
     def test_resample(self):
         x = np.random.choice([True, False], 100000, p = [.5, .5])
         resampled = x[resample(x, .4)]
-        self.assertAlmostEqual(resampled.mean(), .4, 2)
+        self.assertAlmostEqual(resampled.mean(), .4, 1)
 
     """
     def test_df_resample(self):

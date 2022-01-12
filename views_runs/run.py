@@ -8,6 +8,11 @@ from . import validation
 class ViewsRun():
     """
     ViewsRun
+    ========
+
+    parameters:
+        partitioner: views_partitioning.DataPartitioner
+        models: stepshift.views.StepshiftedModels
 
     This class combines modelling and partitioning, delivering predictions in a
     familiar format and concise API.
@@ -25,6 +30,14 @@ class ViewsRun():
     @validation.views_validate
     def fit(self, partition_name: str, timespan_name: str, data: pd.DataFrame)-> None:
         """
+        fit
+        ===
+
+        parameters:
+            partition_name (str)
+            timespan_name (str)
+            data (pandas.DataFrame)
+
         Fit the model to the named partition. partition_name must be present in
         the DataPartitioner.
         """
@@ -34,8 +47,17 @@ class ViewsRun():
     @validation.views_validate
     def predict(self, partition_name: str, timespan_name: str, data: pd.DataFrame)-> pd.DataFrame:
         """
+        predict
+        =======
+
+        parameters:
+            partition_name (str)
+            timespan_name (str)
+            data (pandas.DataFrame)
+
         Predict with data from the named partition. partition_name must be
-        present in the DataPartitioner.
+        present in the DataPartitioner. Returns predictions within the selected
+        timespan.
         """
 
         predictions = self._models.predict(
@@ -44,6 +66,35 @@ class ViewsRun():
         predictions.index.names = data.index.names
         data = data.merge(predictions, how = "left", left_index = True, right_index = True)
         return self._partitioner(partition_name,timespan_name,data)
+
+    @validation.views_validate
+    def future_predict(self, partition_name: str, timespan_name: str, data: pd.DataFrame, keep_specific: bool = False) -> pd.DataFrame:
+        """
+        future_predict
+        ==============
+
+        parameters:
+            partition_name (str)
+            timespan_name (str)
+            data (pandas.DataFrame)
+            keep_specific (bool) = False: Return step-specific predictions as well
+
+        returns:
+            pandas.DataFrame: Dataframe containing future predictions
+
+        Predict into the future using data from the last point in time in the
+        selected partition. Returns step-combined predictions.
+        """
+
+        predictions = self._models.predict(
+                self._shifted_partitioner(partition_name, timespan_name, data),
+                combine = True)
+        end = self._shifted_partitioner.partitions.partitions[partition_name].timespans[timespan_name].end + 1
+        future_preds = predictions.loc[end:]
+        if not keep_specific:
+            future_preds = future_preds[["step_combined"]]
+
+        return future_preds
 
     @property
     def models(self):

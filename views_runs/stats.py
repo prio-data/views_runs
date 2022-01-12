@@ -28,9 +28,7 @@ def resample(x: np.ndarray, prop: float)-> np.ndarray:
     else:
         to_subset = x
 
-    print(selection_mask.sum())
     selection_mask[to_subset] = np.random.choice([True, False], to_subset.sum(), p = [ratio, 1-ratio])
-    print(selection_mask.sum())
 
     return np.linspace(0,x.shape[0]-1, x.shape[0], dtype = int)[selection_mask]
 
