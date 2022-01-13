@@ -77,7 +77,7 @@ class Storage():
 
         Return a list of available model names.
         """
-        return self._model_object_store.list().files
+        return self._model_object_store.list()
 
 def store(name: str, model: Any, metadata: Any):
     warnings.warn("This function is deprecated. Use the views_runs.Storage and its methods instead")
