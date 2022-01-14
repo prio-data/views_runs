@@ -96,6 +96,32 @@ class ViewsRun():
 
         return future_preds
 
+    def future_point_predict(self, time: int, data: pd.DataFrame, keep_specific: bool = False) -> pd.DataFrame:
+        """
+        future_point_predict 
+        ====================
+
+        parameters:
+            time (int): Point in time to predict from, given in views-month (months since 1979-12)
+            data (pandas.DataFrame): Data to predict from
+            keep_specific (bool) = False: Return step-specific predictions as well
+
+        returns:
+            pandas.DataFrame
+
+        Predict into the future from a point in time.
+        """
+        predictions = self._models.predict(
+                data.loc[time - self._models._steps_extent: time],
+                combine = True
+                )
+
+        if not keep_specific:
+            predictions = predictions[["step_combined"]]
+        
+
+        return predictions.loc[time+1 : time + self._models._steps_extent]
+
     @property
     def models(self):
         return self._models.models
