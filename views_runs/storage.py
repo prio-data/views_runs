@@ -1,6 +1,6 @@
 
 import warnings
-from typing import Any, List
+from typing import Any, List, Optional
 from views_storage.serializers.json import JsonSerializable
 from viewser.storage import model_object
 
@@ -20,7 +20,7 @@ class Storage():
         self._model_object_store = model_object.ModelObjectStorage()
         self._metadata_store = model_object.ModelMetadataStorage()
 
-    def store(self, name: str, model: Any, metadata: JsonSerializable = {}, overwrite: bool = False) -> None:
+    def store(self, name: str, model: Any, metadata: JsonSerializable = None, overwrite: bool = False) -> None:
         """
         store
         =====
@@ -34,6 +34,8 @@ class Storage():
         Store a model object and its associated metadata under a unique name.
 
         """
+        if metadata is None:
+            metadata = {}
         self._model_object_store.write(name, model, overwrite = overwrite)
         self._metadata_store.write(name, metadata, overwrite = overwrite)
 
@@ -61,7 +63,7 @@ class Storage():
             name (str): Name of the model to fetch metadata for
 
         returns:
-            JsonSerializable: Metadata for model 
+            JsonSerializable: Metadata for model
 
         Retrieve previously stored metadata for a model.
         """
@@ -78,6 +80,29 @@ class Storage():
         Return a list of available model names.
         """
         return self._model_object_store.list()
+
+    def exists(self, name: str, metadata: Optional[JsonSerializable] = None) -> bool:
+        """
+        exists
+        ======
+
+        parameters:
+            name (str): Name of model
+            metadata (Optional[JsonSerializable]):
+                If provided, checks if existing metadata is equivalent to this.
+
+        returns:
+            bool: Whether object exists or not
+
+        Checks for the existence of a named model. If metadata is provided,
+        also checks that existing metadata is equivalent to the one provided.
+        """
+
+        exists = self._model_object_store.exists(name)
+        if metadata is not None and exists:
+            exists &= metadata == self.fetch_metadata(name)
+
+        return exists
 
 def store(name: str, model: Any, metadata: Any):
     warnings.warn("This function is deprecated. Use the views_runs.Storage and its methods instead")
