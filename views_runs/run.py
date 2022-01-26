@@ -98,7 +98,7 @@ class ViewsRun():
 
     def future_point_predict(self, time: int, data: pd.DataFrame, keep_specific: bool = False) -> pd.DataFrame:
         """
-        future_point_predict 
+        future_point_predict
         ====================
 
         parameters:
@@ -118,10 +118,13 @@ class ViewsRun():
 
         if not keep_specific:
             predictions = predictions[["step_combined"]]
-        
 
         return predictions.loc[time+1 : time + self._models._steps_extent]
 
     @property
     def models(self):
         return self._models.models
+
+    @property
+    def steps(self):
+        return [*self._models.models.keys()]

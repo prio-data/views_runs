@@ -1,7 +1,8 @@
 
 import warnings
 from typing import Any, List, Optional
-from views_storage.serializers.json import JsonSerializable
+from views_schema import models as schema
+from views_storage.types import JsonSerializable
 from viewser.storage import model_object
 
 class Storage():
@@ -20,7 +21,7 @@ class Storage():
         self._model_object_store = model_object.ModelObjectStorage()
         self._metadata_store = model_object.ModelMetadataStorage()
 
-    def store(self, name: str, model: Any, metadata: JsonSerializable = None, overwrite: bool = False) -> None:
+    def store(self, name: str, model: Any, metadata: Optional[schema.ModelMetadata] = None, overwrite: bool = False) -> None:
         """
         store
         =====
@@ -28,16 +29,23 @@ class Storage():
         parameters:
             name (str): Unique name associated with the model
             model (Any): A trained model object
-            metadata (JsonSerializable): A dictionary containing metadata
+            metadata (views_schema.ModelMetadata): An object containing metadata for the model.
             overwrite (bool) = False: Whether to overwrite the model if it already exists
 
         Store a model object and its associated metadata under a unique name.
 
         """
-        if metadata is None:
-            metadata = {}
+
         self._model_object_store.write(name, model, overwrite = overwrite)
-        self._metadata_store.write(name, metadata, overwrite = overwrite)
+
+        if metadata:
+            self.store_metadata(name, metadata, overwrite)
+
+    def store_metadata(self, name: str, metadata: schema.ModelMetadata, overwrite: bool = False) -> None:
+        if self._model_object_store.exists(name):
+            self._metadata_store.write(name, metadata, overwrite = overwrite)
+        else:
+            raise KeyError(f"No model named {name}. Store a model object before storing metadata")
 
     def retrieve(self, name: str) -> Any:
         """
@@ -81,7 +89,7 @@ class Storage():
         """
         return self._model_object_store.list()
 
-    def exists(self, name: str, metadata: Optional[JsonSerializable] = None) -> bool:
+    def exists(self, name: str, metadata: Optional[schema.ModelMetadata] = None) -> bool:
         """
         exists
         ======
