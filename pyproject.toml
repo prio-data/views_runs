@@ -1,12 +1,14 @@
 [tool.poetry]
 name = "views_runs"
-version = "1.12.0"
+version = "1.12.1"
 description = ""
 authors = ["peder2911 <pglandsverk@gmail.com>"]
+readme = "README.md"
+homepage = "https://www.github.com/prio-data/stepshift"
 
 [tool.poetry.dependencies]
 python = "^3.8,<3.10"
-stepshift = "~=2.2.0"
+stepshift = "^2.2.1"
 views-partitioning = "^3.0.0"
 viewser = "^5.12.0"
 views-schema="^2.2.0"
