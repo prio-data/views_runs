@@ -1,10 +1,10 @@
 [tool.poetry]
 name = "views_runs"
-version = "1.12.1"
+version = "1.12.2"
 description = ""
 authors = ["peder2911 <pglandsverk@gmail.com>"]
 readme = "README.md"
-homepage = "https://www.github.com/prio-data/stepshift"
+homepage = "https://www.github.com/prio-data/views_runs"
 
 [tool.poetry.dependencies]
 python = "^3.8,<3.10"
