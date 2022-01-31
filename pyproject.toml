@@ -1,7 +1,6 @@
 [tool.poetry]
 name = "views_runs"
-version = "1.12.2"
-description = ""
+version = "1.12.3"
 authors = ["peder2911 <pglandsverk@gmail.com>"]
 readme = "README.md"
 homepage = "https://www.github.com/prio-data/views_runs"
