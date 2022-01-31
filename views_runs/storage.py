@@ -14,7 +14,6 @@ class Storage():
     and associated metadata. Works as a key-value store, with each (model)
     object being associated with a unique name, which is then used to fetch
     both the object and its metadata.
-
     """
 
     def __init__(self):
@@ -41,12 +40,6 @@ class Storage():
         if metadata:
             self.store_metadata(name, metadata, overwrite)
 
-    def store_metadata(self, name: str, metadata: schema.ModelMetadata, overwrite: bool = False) -> None:
-        if self._model_object_store.exists(name):
-            self._metadata_store.write(name, metadata, overwrite = overwrite)
-        else:
-            raise KeyError(f"No model named {name}. Store a model object before storing metadata")
-
     def retrieve(self, name: str) -> Any:
         """
         retrieve
@@ -61,6 +54,38 @@ class Storage():
         Retrieve a stored model object.
         """
         return self._model_object_store.read(name)
+
+    def store_metadata(self, name: str, metadata: schema.ModelMetadata, overwrite: bool = False) -> None:
+        """
+        store_metadata
+        ==============
+
+        parameters:
+            name (str)
+            metadata (views_schema.ModelMetadata)
+            overwrite (bool) = False
+
+        Stores metadata for a model object. Can be used to update metadata for
+        a model if overwrite is True.
+        """
+        if self._model_object_store.exists(name):
+            self._metadata_store.write(name, metadata, overwrite = overwrite)
+        else:
+            raise KeyError(f"No model named {name}. Store a model object before storing metadata")
+
+    def has_metadata(self, name: str) -> bool:
+        """
+        has_metadata
+        ============
+
+        parameters:
+            name (str)
+        returns:
+            bool: Whether model has metadata or not
+
+        Checks whether a model has metadata defined for it.
+        """
+        return self._metadata_store.exists(name)
 
     def fetch_metadata(self, name: str) -> JsonSerializable :
         """
@@ -111,6 +136,22 @@ class Storage():
             exists &= metadata == self.fetch_metadata(name)
 
         return exists
+
+    def exists_with_metadata(self, name: str, metadata: schema.ModelMetadata) -> bool:
+        """
+        exists_with_metadata
+        ====================
+
+        parameters:
+            name (str)
+            metadata (views_schema.ModelMetadata)
+
+        returns:
+            bool
+
+        Checks whether a model exists with this exact metadata specified.
+        """
+        return self.exists(name) and self.has_metadata(name) and metadata == self.fetch_metadata(name)
 
 def store(name: str, model: Any, metadata: Any):
     warnings.warn("This function is deprecated. Use the views_runs.Storage and its methods instead")

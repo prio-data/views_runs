@@ -6,10 +6,9 @@ This example script shows you how to train a basic model object and store it
 using the provided storage class.
 """
 
-import datetime
 from sklearn.linear_model import LinearRegression
 from viewser import Queryset,Column
-from views_runs import ViewsRun, StepshiftedModels, DataPartitioner, ModelMetadata, Storage
+from views_runs import ViewsRun, StepshiftedModels, DataPartitioner, Storage
 
 # We instantiate the store, which we'll use to save our model object
 store = Storage()
@@ -29,13 +28,11 @@ run.fit("A", "train", data)
 
 # We want to add metadata for our object
 
-metadata = ModelMetadata(
+metadata = run.create_model_metadata(
         author = "testuser",
-        run_id = "testing",
         queryset_name = "views-runs-example-queryset",
-        train_start = 1,
-        train_end = 300,
-        training_date = datetime.datetime.now())
+        training_partition_name = "A",
+        )
 
 #  We can store both the model object and the metadata at the same time
 
@@ -48,13 +45,7 @@ assert metadata == store.fetch_metadata("views-runs-example-run")
 # Here's how you could choose to store a new model object only if the existing
 # object has the same metadata and steps
 
-existing_is_equivalent = (
-        store.exists("views-runs-example-run") and
-        metadata == store.fetch_metadata("views-runs-example-run") and
-        store.retrieve("views-runs-example-run").steps == run.steps
-        )
-
-if existing_is_equivalent:
+if store.exists_with_metadata("views-runs-example-run", metadata):
     print("The existing stored data is equivalent, I won't bother overwriting it")
 else:
     print("Overwriting store data, since it differs from what I got...")

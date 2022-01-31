@@ -1,6 +1,9 @@
 
+from typing import Optional
+import datetime
 from stepshift.views import StepshiftedModels
 from views_partitioning import DataPartitioner
+from views_schema.models import ModelMetadata
 import pandas as pd
 
 from . import validation
@@ -24,6 +27,8 @@ class ViewsRun():
 
     def __init__(self, partitioner: DataPartitioner, models: StepshiftedModels):
         self._models = models
+        # Partitioner is shifted to include training data covering N steps
+        # behind the specified training period.
         self._shifted_partitioner = partitioner.shift_left(self._models._steps_extent)
         self._partitioner = partitioner
 
@@ -120,6 +125,41 @@ class ViewsRun():
             predictions = predictions[["step_combined"]]
 
         return predictions.loc[time+1 : time + self._models._steps_extent]
+
+    def create_model_metadata(self,
+            author: str,
+            queryset_name: str,
+            training_partition_name: str,
+            training_timespan_name: str = "train",
+            training_date: Optional[datetime.datetime] = None) -> ModelMetadata:
+        """
+        create_model_metadata
+        ===============
+
+        parameters:
+            author (str): The author of the model (you)
+            queryset_name (str): The name of the queryset used to train the model
+            training_partition_name (str): The name of the partition containing the training timespan
+            training_timespan_name (str): The name of the training timespan = "train"
+            training_date (Optional[datetime.datetime]) = None (defaults to datetime.datetime.now())
+        returns:
+            views_schema.models.ModelMetadata
+
+        Create a metadata instance based on provided metadata and data from the
+        model and partitioner objects associated with the run.
+        """
+
+        training_date = training_date if training_date is not None else datetime.datetime.now()
+        train_start, train_end = self._partitioner.partitions.partitions[training_partition_name].timespans[training_timespan_name]
+
+        return ModelMetadata(
+                author        = author,
+                queryset_name = queryset_name,
+                steps         = [*self._models.models.keys()],
+                train_start   = train_start,
+                train_end     = train_end,
+                training_date = training_date,
+                )
 
     @property
     def models(self):
