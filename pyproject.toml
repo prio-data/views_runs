@@ -5,6 +5,7 @@ description = ""
 authors = ["peder2911 <pglandsverk@gmail.com>"]
 readme = "README.md"
 homepage = "https://www.github.com/prio-data/views_runs"
+description = "Tools for doing model runs with views"
 
 [tool.poetry.dependencies]
 python = "^3.8,<3.10"
