@@ -71,10 +71,6 @@ def retrain_or_retrieve(
             data_preprocessing = plus_ten)
     """
 
-    data = data_preprocessing(fetch(queryset_name))
-
-    validation.dataframe_is_right_format(data)
-
     views_run = run.ViewsRun(partitioner, stepshifted_models)
 
     metadata = views_run.create_model_metadata(
@@ -84,6 +80,8 @@ def retrain_or_retrieve(
             training_timespan_name = timespan_name)
 
     if retrain or not store.exists_with_metadata(storage_name, metadata):
+        data = data_preprocessing(fetch(queryset_name))
+        validation.dataframe_is_right_format(data)
         views_run.fit(partition_name, timespan_name, data)
         store.store(storage_name, views_run, metadata)
     else:
