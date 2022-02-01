@@ -87,7 +87,7 @@ class Storage():
         """
         return self._metadata_store.exists(name)
 
-    def fetch_metadata(self, name: str) -> JsonSerializable :
+    def fetch_metadata(self, name: str) -> schema.ModelMetadata:
         """
         retrieve
         ========
@@ -130,12 +130,11 @@ class Storage():
         Checks for the existence of a named model. If metadata is provided,
         also checks that existing metadata is equivalent to the one provided.
         """
-
-        exists = self._model_object_store.exists(name)
-        if metadata is not None and exists:
-            exists &= metadata == self.fetch_metadata(name)
-
-        return exists
+        if metadata is not None:
+            warnings.warn("The metadata parameter is deprecated for this function. Use .exists_with_metadata instead (readability)")
+            return self.exists_with_metadata(name, metadata)
+        else:
+            return self._model_object_store.exists(name)
 
     def exists_with_metadata(self, name: str, metadata: schema.ModelMetadata) -> bool:
         """
@@ -151,7 +150,16 @@ class Storage():
 
         Checks whether a model exists with this exact metadata specified.
         """
-        return self.exists(name) and self.has_metadata(name) and metadata == self.fetch_metadata(name)
+
+        exists = self.exists(name)
+        if exists and self.has_metadata(name):
+            existing_metadata = self.fetch_metadata(name)
+
+            # Ignore training_date value when checking equivalence
+            equivalent = copy(metadata)
+            equivalent.training_date = existing_metadata.training_date
+            exists &= equivalent == existing_metadata
+        return exists 
 
 def store(name: str, model: Any, metadata: Any):
     warnings.warn("This function is deprecated. Use the views_runs.Storage and its methods instead")
