@@ -1,4 +1,5 @@
 
+import copy
 import warnings
 from typing import Any, List, Optional
 from views_schema import models as schema
@@ -156,7 +157,7 @@ class Storage():
             existing_metadata = self.fetch_metadata(name)
 
             # Ignore training_date value when checking equivalence
-            equivalent = copy(metadata)
+            equivalent = copy.copy(metadata)
             equivalent.training_date = existing_metadata.training_date
             exists &= equivalent == existing_metadata
         return exists 

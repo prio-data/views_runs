@@ -79,9 +79,10 @@ def retrain_or_retrieve(
             training_partition_name = partition_name,
             training_timespan_name = timespan_name)
 
+    data = data_preprocessing(fetch(queryset_name))
+    validation.dataframe_is_right_format(data)
+
     if retrain or not store.exists_with_metadata(storage_name, metadata):
-        data = data_preprocessing(fetch(queryset_name))
-        validation.dataframe_is_right_format(data)
         views_run.fit(partition_name, timespan_name, data)
         store.store(storage_name, views_run, metadata)
     else:
