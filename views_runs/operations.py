@@ -84,7 +84,7 @@ def retrain_or_retrieve(
 
     if retrain or not store.exists_with_metadata(storage_name, metadata):
         views_run.fit(partition_name, timespan_name, data)
-        store.store(storage_name, views_run, metadata)
+        store.store(storage_name, views_run, metadata, overwrite = True)
     else:
         views_run = store.retrieve(storage_name)
 

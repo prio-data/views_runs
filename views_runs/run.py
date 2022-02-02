@@ -27,6 +27,7 @@ class ViewsRun():
 
     def __init__(self, partitioner: DataPartitioner, models: StepshiftedModels):
         self._models = models
+
         # Partitioner is shifted to include training data covering N steps
         # behind the specified training period.
         self._shifted_partitioner = partitioner.shift_left(self._models._steps_extent)
