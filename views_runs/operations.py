@@ -3,8 +3,7 @@ from typing import Callable, Tuple, Dict
 import pandas as pd
 from views_partitioning import data_partitioner
 from stepshift import views
-from viewser.operations import fetch
-from views_runs import run, validation, storage
+from views_runs import run, storage, run_result
 
 def retrain_or_retrieve(
         store: storage.Storage,
@@ -70,25 +69,17 @@ def retrain_or_retrieve(
             author_name        = "me",
             data_preprocessing = plus_ten)
     """
-
-    views_run = run.ViewsRun(partitioner, stepshifted_models)
-
-    metadata = views_run.create_model_metadata(
-            author = author_name,
-            queryset_name = queryset_name,
-            training_partition_name = partition_name,
-            training_timespan_name = timespan_name)
-
-    data = data_preprocessing(fetch(queryset_name))
-    validation.dataframe_is_right_format(data)
-
-    if retrain or not store.exists_with_metadata(storage_name, metadata):
-        views_run.fit(partition_name, timespan_name, data)
-        store.store(storage_name, views_run, metadata, overwrite = True)
-    else:
-        views_run = store.retrieve(storage_name)
-
-    return views_run, data
+    return run_result.RunResult.retrain_or_retrieve(
+        store,
+        partitioner,
+        stepshifted_models,
+        queryset_name,
+        partition_name,
+        storage_name,
+        author_name,
+        timespan_name,
+        retrain,
+        data_preprocessing)
 
 def hurdle_feature_importances(data: pd.DataFrame, views_run: run.ViewsRun) -> Dict[int, pd.DataFrame]:
     """
