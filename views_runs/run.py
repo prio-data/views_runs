@@ -156,7 +156,7 @@ class ViewsRun():
         return ModelMetadata(
                 author        = author,
                 queryset_name = queryset_name,
-                steps         = [*self._models.models.keys()],
+                steps         = self._models._steps,
                 train_start   = train_start,
                 train_end     = train_end,
                 training_date = training_date,

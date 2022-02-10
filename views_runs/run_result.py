@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable 
 import pandas as pd
 from views_schema import ModelMetadata
 from viewser.operations import fetch
