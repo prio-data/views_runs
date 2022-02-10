@@ -3,6 +3,7 @@ from views_schema import ModelMetadata
 from stepshift import views
 from views_partitioning import data_partitioner
 from views_runs import storage, run
+from viewser.settings import config
 
 class RunResult():
     """
@@ -90,6 +91,7 @@ class RunResult():
             author_name        (str)
             timespan_name      (str) = "train"
             retrain            (bool) = False
+
         returns:
             views_runs.run.ViewsRun
 
@@ -117,6 +119,8 @@ class RunResult():
                 author_name        = "me")
         """
 
+        print(f" * == Performing a run: \"{storage_name}\" == * ")
+
         views_run = run.ViewsRun(partitioner, stepshifted_models)
 
         metadata = views_run.create_model_metadata(
@@ -128,11 +132,22 @@ class RunResult():
         result = cls(views_run, metadata, dataset)
 
         exists = store.exists_with_metadata(storage_name, metadata)
+
+        if exists:
+            print((
+                f"Model object named \"{storage_name}\" with "
+                "equivalent metadata already exists."))
+            if retrain:
+                print(f"Retrain is true, overwriting \"{storage_name}\"")
+
         if retrain or not exists:
             result.retrained = exists
+            print("Training model(s)...")
             result._fit(partition_name, timespan_name)
+            print(f"Storing \"{storage_name}\"")
             store.store(storage_name, result.run, result.metadata, overwrite = True)
         else:
+            print(f"Fetching \"{storage_name}\" from storage")
             result.run = store.retrieve(storage_name)
 
         return result

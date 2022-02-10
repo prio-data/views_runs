@@ -33,6 +33,7 @@ Each class and module mentioned here has more documentation. Use the help()
 function.
 
 """
+import logging
 
 from .run import ViewsRun
 from .storage import Storage

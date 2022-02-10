@@ -22,9 +22,6 @@ result = RunResult.retrain_or_retrieve(
         storage_name       = "production-run-example",
         author_name        = "example")
 
-print(result.retrained)
-print(result.data)
-
 result = RunResult.retrain_or_retrieve(
         store              = store,
         partitioner        = DataPartitioner({"A": {"train": (1,100)}}),
@@ -36,5 +33,3 @@ result = RunResult.retrain_or_retrieve(
         author_name        = "example",
         retrain            = True)
 
-print(result.retrained)
-print(result.data)
