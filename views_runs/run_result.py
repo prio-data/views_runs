@@ -96,7 +96,15 @@ class RunResult():
             views_runs.run.ViewsRun
 
         Create a new RunResult by either training a views run, or retrieving it
-        from storage if a run corresponding to the storage_name is found.
+        from storage if a run corresponding to the storage_name with equivalent
+        metadata is found.
+
+        Metadata is compared by checking whether these attributes match:
+            * author
+            * queryset_name
+            * train_start
+            * train_end
+            * steps
 
         examples:
 
