@@ -1,7 +1,6 @@
 
 from sklearn.linear_model import LinearRegression
-from viewser import Queryset, Column
-from views_runs import operations
+from viewser import Queryset, Column, fetch
 from views_runs import Storage, StepshiftedModels, DataPartitioner
 from views_runs.run_result import RunResult
 
@@ -11,11 +10,13 @@ from views_runs.run_result import RunResult
         .publish())
 
 store = Storage()
+data = fetch("production-run-example-queryset")
 
 result = RunResult.retrain_or_retrieve(
         store              = store,
         partitioner        = DataPartitioner({"A": {"train": (1,100)}}),
         stepshifted_models = StepshiftedModels(LinearRegression(), [*range(1,13)], "ged_dep"),
+        dataset            = data,
         queryset_name      = "production-run-example-queryset",
         partition_name     = "A",
         storage_name       = "production-run-example",
@@ -28,6 +29,7 @@ result = RunResult.retrain_or_retrieve(
         store              = store,
         partitioner        = DataPartitioner({"A": {"train": (1,100)}}),
         stepshifted_models = StepshiftedModels(LinearRegression(), [*range(1,13)], "ged_dep"),
+        dataset            = data,
         queryset_name      = "production-run-example-queryset",
         partition_name     = "A",
         storage_name       = "production-run-example",
