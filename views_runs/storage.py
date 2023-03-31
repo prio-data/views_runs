@@ -19,7 +19,7 @@ class Storage():
 
     def __init__(self):
         self._model_object_store = model_object.ModelObjectStorage()
-        self._metadata_store = model_object.ModelMetadataStorage()
+        self._metadata_store = None
 
     def store(self, name: str, model: Any, metadata: Optional[schema.ModelMetadata] = None, overwrite: bool = False) -> None:
         """
@@ -38,8 +38,9 @@ class Storage():
 
         self._model_object_store.write(name, model, overwrite = overwrite)
 
-        if metadata:
-            self.store_metadata(name, metadata, overwrite)
+        self.open_metadata_storage_connection()
+
+        self.store_metadata(name, metadata, overwrite)
 
     def retrieve(self, name: str) -> Any:
         """
@@ -70,6 +71,7 @@ class Storage():
         a model if overwrite is True.
         """
         if self._model_object_store.exists(name):
+            self.open_metadata_storage_connection()
             self._metadata_store.write(name, metadata, overwrite = overwrite)
         else:
             raise KeyError(f"No model named {name}. Store a model object before storing metadata")
@@ -86,6 +88,9 @@ class Storage():
 
         Checks whether a model has metadata defined for it.
         """
+
+        self.open_metadata_storage_connection()
+
         return self._metadata_store.exists(name)
 
     def fetch_metadata(self, name: str) -> schema.ModelMetadata:
@@ -101,6 +106,9 @@ class Storage():
 
         Retrieve previously stored metadata for a model.
         """
+
+        self.open_metadata_storage_connection()
+
         return self._metadata_store.read(name)
 
     def list(self) -> List[str]:
@@ -161,6 +169,20 @@ class Storage():
             equivalent.training_date = existing_metadata.training_date
             exists &= equivalent == existing_metadata
         return exists 
+
+    def open_metadata_storage_connection(self):
+        itry = 0
+        while itry < 10:
+            itry += 1
+            #                print(f'Attempting to get db connection ({itry})')
+            try:
+                self._metadata_store = model_object.ModelMetadataStorage()
+                break
+            except:
+                pass
+
+        return
+
 
 def store(name: str, model: Any, metadata: Any):
     warnings.warn("This function is deprecated. Use the views_runs.Storage and its methods instead")
