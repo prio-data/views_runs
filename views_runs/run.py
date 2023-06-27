@@ -114,7 +114,7 @@ class ViewsRun():
 
         return future_preds
 
-    def future_point_predict(self, time: int, data: pd.DataFrame, keep_specific: bool = False) -> pd.DataFrame:
+    def future_point_predict(self, time: int, data: pd.DataFrame, keep_specific: bool = False, proba: bool = False) -> pd.DataFrame:
         """
         future_point_predict
         ====================
@@ -129,7 +129,14 @@ class ViewsRun():
 
         Predict into the future from a point in time.
         """
-        predictions = self._models.predict(
+
+        if proba:
+            predictions = self._models.predict_proba(
+                data.loc[time - self._models._steps_extent: time],
+                combine=True
+            )
+        else:
+            predictions = self._models.predict(
                 data.loc[time - self._models._steps_extent: time],
                 combine = True
                 )
