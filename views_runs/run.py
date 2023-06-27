@@ -51,7 +51,7 @@ class ViewsRun():
         self._models.fit(self._shifted_partitioner(partition_name,timespan_name,data))
 
     @validation.views_validate
-    def predict(self, partition_name: str, timespan_name: str, data: pd.DataFrame)-> pd.DataFrame:
+    def predict(self, partition_name: str, timespan_name: str, data: pd.DataFrame, proba: bool = False)-> pd.DataFrame:
         """
         predict
         =======
@@ -66,15 +66,21 @@ class ViewsRun():
         timespan.
         """
 
-        predictions = self._models.predict(
+        if proba:
+            predictions = self._models.predict_proba(
                 self._shifted_partitioner(partition_name, timespan_name, data),
-                combine = False)
+                combine=False)
+        else:
+            predictions = self._models.predict(
+                self._shifted_partitioner(partition_name, timespan_name, data),
+                combine=False)
+
         predictions.index.names = data.index.names
         data = data.merge(predictions, how = "left", left_index = True, right_index = True)
         return self._partitioner(partition_name,timespan_name,data)
 
     @validation.views_validate
-    def future_predict(self, partition_name: str, timespan_name: str, data: pd.DataFrame, keep_specific: bool = False) -> pd.DataFrame:
+    def future_predict(self, partition_name: str, timespan_name: str, data: pd.DataFrame, keep_specific: bool = False, proba: bool = False) -> pd.DataFrame:
         """
         future_predict
         ==============
@@ -92,9 +98,15 @@ class ViewsRun():
         selected partition. Returns step-combined predictions.
         """
 
-        predictions = self._models.predict(
+        if proba:
+            predictions = self._models.predict_proba(
                 self._shifted_partitioner(partition_name, timespan_name, data),
-                combine = True)
+                combine=True)
+        else:
+            predictions = self._models.predict(
+                self._shifted_partitioner(partition_name, timespan_name, data),
+                combine=True)
+
         end = self._shifted_partitioner.partitions.partitions[partition_name].timespans[timespan_name].end + 1
         future_preds = predictions.loc[end:]
         if not keep_specific:
